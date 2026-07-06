@@ -35,9 +35,16 @@ public class InsertTransactionalTasklet implements Tasklet {
         Object rawData = jobExecutionContext.get("TRANSACTION_ROWS");
         ArrayList<BankingTransaction> bankingData = (ArrayList<BankingTransaction>) rawData;
 
+
         for (BankingTransaction bankingTransaction : bankingData) {
-            dao.insert(bankingTransaction);
-            contribution.incrementWriteCount(1);
+            try{
+                dao.insert(bankingTransaction);
+                contribution.incrementWriteCount(1);
+
+            }catch (Exception e){
+                contribution.incrementWriteSkipCount();
+                System.out.println(e.getMessage());
+            }
         }
 
         return RepeatStatus.FINISHED;
